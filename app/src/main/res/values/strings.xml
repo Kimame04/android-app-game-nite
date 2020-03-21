@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Game Nite</string>
+
+    <string name="bottom_nav_user">Profile</string>
+    <string name="bottom_nav_suggestions">Explore</string>
+    <string name="bottom_nav_calendar">My Events</string>
+    <string name="bottom_nav_settings">Settings</string>
+</resources>

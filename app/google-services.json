@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "261019548771",
+    "firebase_url": "https://game-nite-6a0ec.firebaseio.com",
+    "project_id": "game-nite-6a0ec",
+    "storage_bucket": "game-nite-6a0ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261019548771:android:fa0d7448dec9426a804c56",
+        "android_client_info": {
+          "package_name": "com.example.gamenite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261019548771-6ltc4ns1qk6r5ql2ogikum8sihjc1l8s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gamenite",
+            "certificate_hash": "349e2ad75f1b21607a27f12abd64c2b1e1382b39"
+          }
+        },
+        {
+          "client_id": "261019548771-1lfsc9mcs238a55deo9c6kun9p4a6eq4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDB8RFxbmxa_tRamamhj29nWwhn2PDnI_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261019548771-1lfsc9mcs238a55deo9c6kun9p4a6eq4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
