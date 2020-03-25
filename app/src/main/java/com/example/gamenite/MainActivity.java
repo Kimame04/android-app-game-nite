@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gamenite.fragments.EventsFragment;
@@ -29,8 +31,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.seismic.ShakeDetector;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private static FrameLayout frameLayout;
@@ -42,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser firebaseUser;
+
+    private SensorManager sensorManager;
+    private ShakeDetector shakeDetector;
 
     private static final int RC_SIGN_IN = 1;
 
@@ -80,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
         frameLayout = findViewById(R.id.fragment_container);
+        relativeLayout = findViewById(R.id.main_rl);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -105,7 +113,13 @@ public class MainActivity extends AppCompatActivity {
         };
         firebaseAuth.addAuthStateListener(authStateListener);
 
-        relativeLayout = findViewById(R.id.main_rl);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        shakeDetector = new ShakeDetector(new ShakeDetector.Listener() {
+            @Override
+            public void hearShake() {
+
+            }
+        });
     }
 
     @Override
@@ -121,21 +135,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static boolean isConnectedToInternet(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-    public static void showNoConnectionSnackBar() {
-        final Snackbar snackbar = Snackbar.make(frameLayout, "No Internet Connection", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction("Ok", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        });
-        snackbar.show();
-    }
 }
