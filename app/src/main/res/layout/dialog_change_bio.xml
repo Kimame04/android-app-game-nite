@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/dialog_bio_ll"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingVertical="5dp"
+    android:paddingHorizontal="20dp">
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/colorPrimary"
+        android:text="@string/dialog_bio_title"/>
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/dialog_name_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/dialog_bio_hint"
+        android:maxLines="10"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_name_chars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10dp"
+        android:layout_gravity="end"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialog_name_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_bio_button"
+        android:textColor="@color/colorSecondary"
+        android:layout_gravity="center"/>
+</LinearLayout>

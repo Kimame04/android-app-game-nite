@@ -1,21 +1,64 @@
 package com.example.gamenite.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.gamenite.R;
+import com.example.gamenite.helpers.FirebaseInfo;
 
-public class SettingsFragment extends Fragment {
-    @Nullable
+public class SettingsFragment extends PreferenceFragmentCompat {
+
+    private Context context;
+    private static Preference.OnPreferenceChangeListener onPreferenceChangeListener =
+            new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    String value = newValue.toString();
+                    if(preference instanceof ListPreference){
+                        ListPreference listPreference = (ListPreference)preference;
+                        int index = listPreference.findIndexOfValue(value);
+                        if(listPreference.getValue()==null)
+                            listPreference.setValueIndex(1);
+                        preference.setSummary(index>=0? listPreference.getEntries()[index]:null);
+                    }
+                    return true;
+                }
+            };
+
+    private static void bindSummaryValue(Preference preference){
+        preference.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        onPreferenceChangeListener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(),""));
+    }
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings,container,false);
-        return view;
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.settings,rootKey);
+        getActivity().setTitle("Settings");
+        setHasOptionsMenu(true);
+        context = getContext();
+        bindSummaryValue(findPreference("settings_startup_fragment"));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_settings,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.settings_menu_logout:
+                FirebaseInfo.logoutUser(getContext());break;
+        }
+        return true;
     }
 }

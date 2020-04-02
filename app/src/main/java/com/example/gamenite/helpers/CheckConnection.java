@@ -1,4 +1,4 @@
-package com.example.gamenite.models;
+package com.example.gamenite.helpers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

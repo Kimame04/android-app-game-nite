@@ -14,7 +14,12 @@
         android:icon="@drawable/ic_event_black_24dp"
         android:title="@string/bottom_nav_calendar" />
     <item
+        android:id="@+id/notifications"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/bottom_nav_alerts"/>
+    <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/bottom_nav_settings" />
+
 </menu>

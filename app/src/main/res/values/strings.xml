@@ -5,4 +5,61 @@
     <string name="bottom_nav_suggestions">Explore</string>
     <string name="bottom_nav_calendar">My Events</string>
     <string name="bottom_nav_settings">Settings</string>
+    <string name="bottom_nav_alerts">Notifications</string>
+
+    <string name="events_interested">I\'m Interested</string>
+    <string name="events_nothanks">No thanks</string>
+    <string name="events_cancel">Cancel</string>
+    <string name="events_location">Show Location</string>
+
+    <string name="dialog_show_location_title">Showing location</string>
+
+    <string name="settings_title">Startup</string>
+    <string name="settings_start_fragment">Select default tab to launch</string>
+    <string-array name="settings_start_fragment_list">
+        <item>Profile</item>
+        <item>Explore</item>
+        <item>My Events</item>
+        <item>Settings</item>
+        <item>Notifications</item>
+    </string-array>
+    <string name="title_activity_maps">Map</string>
+
+    <string-array name="events_category">
+        <item>Interested</item>
+        <item>By Me (Ongoing)</item>
+        <item>History</item>
+    </string-array>
+    <string name="events_spinner_title">Select a category: </string>
+    <string name="events_title">Add Event</string>
+    <string name="events_name">Name</string>
+    <string name="events_description">Description</string>
+    <string name="events_quota">Set a quota</string>
+    <string name="events_deadline">Scheduled for…</string>
+    <string name="events_select_location">Select desired location</string>
+    <string name="events_disclaimer">Note that this event will stop accepting attendees once quota is reached, or if quota is not reached 24 hours before start of event. Set the date with at least 24 hours in advance.</string>
+    <string name="events_clear_map">Clear map</string>
+
+    <string name="profile_bio_title">Biography</string>
+    <string name="profile_friends_title">Friends</string>
+    <string name="profile_events_title">Participated</string>
+    <string name="profile_host_title">Hosted</string>
+    <string name="profile_rating_header">Rating</string>
+    <string name="profile_stats_header">Stats</string>
+
+    <string name="dialog_bio_title">Enter new biography</string>
+    <string name="dialog_bio_hint">Keep it within 140 characters long!</string>
+    <string name="dialog_bio_button">Change my bio!</string>
+
+    <string name="dialog_friend_title">Add a friend using a code</string>
+    <string name="dialog_friend_disclaimer">You will receive a notification if your request has been accepted.</string>
+    <string name="dialog_friend_hint">E.g 1234–5678–9012-3456</string>
+    <string name="dialog_friend_submit">Send</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="edit">Edit</string>
+    <string name="refresh">Refresh</string>
+    <string name="add_friend">Add Friend</string>
 </resources>

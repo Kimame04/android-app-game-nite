@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/dialog_friend_ll"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="20dp"
+    android:layout_marginHorizontal="30dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_friend_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="30dp"
+        android:text="@string/dialog_friend_title"
+        android:textSize="20sp"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_friend_disclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginVertical="10dp"
+        android:gravity="center"
+        android:text="@string/dialog_friend_disclaimer" />
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/dialog_friend_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/dialog_friend_hint"
+        android:singleLine="true"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialog_friend_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_person_add_black_24dp"
+        app:iconTint="@color/colorSecondary"
+        android:text="@string/dialog_friend_submit"
+        android:textColor="@color/colorSecondary"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"/>
+</LinearLayout>
