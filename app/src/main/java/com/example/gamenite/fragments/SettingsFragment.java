@@ -14,24 +14,22 @@ import androidx.preference.PreferenceManager;
 
 import com.example.gamenite.R;
 import com.example.gamenite.helpers.FirebaseInfo;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private Context context;
     private static Preference.OnPreferenceChangeListener onPreferenceChangeListener =
-            new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    String value = newValue.toString();
-                    if(preference instanceof ListPreference){
-                        ListPreference listPreference = (ListPreference)preference;
-                        int index = listPreference.findIndexOfValue(value);
-                        if(listPreference.getValue()==null)
-                            listPreference.setValueIndex(1);
-                        preference.setSummary(index>=0? listPreference.getEntries()[index]:null);
-                    }
-                    return true;
+            (preference, newValue) -> {
+                String value = newValue.toString();
+                if (preference instanceof ListPreference) {
+                    ListPreference listPreference = (ListPreference) preference;
+                    int index = listPreference.findIndexOfValue(value);
+                    if (listPreference.getValue() == null)
+                        listPreference.setValueIndex(1);
+                    preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
                 }
+                return true;
             };
 
     private static void bindSummaryValue(Preference preference){
@@ -57,7 +55,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.settings_menu_logout:
-                FirebaseInfo.logoutUser(getContext());break;
+                new MaterialAlertDialogBuilder(context).setTitle("Logout")
+                        .setMessage("Sign out from this account?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            FirebaseInfo.logoutUser(context);
+                        }).setNegativeButton("No", null).show();
         }
         return true;
     }

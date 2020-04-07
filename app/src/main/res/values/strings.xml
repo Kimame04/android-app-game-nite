@@ -28,7 +28,7 @@
     <string-array name="events_category">
         <item>Interested</item>
         <item>By Me (Ongoing)</item>
-        <item>History</item>
+        <item>Not rated</item>
     </string-array>
     <string name="events_spinner_title">Select a category: </string>
     <string name="events_title">Add Event</string>
@@ -37,7 +37,7 @@
     <string name="events_quota">Set a quota</string>
     <string name="events_deadline">Scheduled for…</string>
     <string name="events_select_location">Select desired location</string>
-    <string name="events_disclaimer">Note that this event will stop accepting attendees once quota is reached, or if quota is not reached 24 hours before start of event. Set the date with at least 24 hours in advance.</string>
+    <string name="events_disclaimer">Set the date with at least 24 hours in advance.\nAlso note that cancellation at ANY POINT will lead to a 0-star rating.</string>
     <string name="events_clear_map">Clear map</string>
 
     <string name="profile_bio_title">Biography</string>
@@ -56,10 +56,21 @@
     <string name="dialog_friend_hint">E.g 1234–5678–9012-3456</string>
     <string name="dialog_friend_submit">Send</string>
 
+    <string name="dialog_rate_event">Rate your experience!</string>
+
+    <string name="notifications_friend_requests">Friend Requests</string>
+    <string name="notifications_event_updates">Event Updates</string>
+
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="clear">Clear</string>
     <string name="edit">Edit</string>
     <string name="refresh">Refresh</string>
     <string name="add_friend">Add Friend</string>
+    <string name="search">Search</string>
+    <string name="close">close</string>
+    <string name="participants">Participants</string>
+    <string name="title_activity_onboarding">OnboardingActivity</string>
+    <string name="update">Make an update</string>
+    <string name="submit">Submit</string>
 </resources>

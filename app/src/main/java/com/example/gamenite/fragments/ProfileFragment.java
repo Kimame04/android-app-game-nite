@@ -2,6 +2,8 @@ package com.example.gamenite.fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,9 +25,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.gamenite.R;
 import com.example.gamenite.helpers.CheckConnection;
-import com.example.gamenite.helpers.Database;
+import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.helpers.GenerateDialog;
+import com.example.gamenite.models.Database;
 import com.example.gamenite.models.User;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileFragment extends Fragment implements GenerateDialog {
+public class ProfileFragment extends Fragment {
     private TextView bio;
     private TextView profileName;
     private TextView avgRating;
@@ -62,21 +64,25 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
         String input = friendCodeEt.getText().toString();
         User currentUser = Database.getCurrentUser();
         User otherUser = Database.findUser(input);
-        ArrayList<String> friends = otherUser.getFriendRequestList();
-        if(!CheckConnection.isConnectedToInternet(context))
-            CheckConnection.showNoConnectionSnackBar(friendLl);
-        else if(otherUser==null)
-            Snackbar.make(friendLl,"User does not exist.",BaseTransientBottomBar.LENGTH_SHORT).show();
-        else if(friends.contains(currentUser.getUid()))
-            Snackbar.make(friendLl,"You already sent them a request.",BaseTransientBottomBar.LENGTH_SHORT).show();
-        else{
-            DatabaseReference toOtherUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users").child(otherUser.getFirebaseId());
-            Map<String,Object> map = new HashMap<>();
-            otherUser.getFriendRequestList().add(currentUser.getUid());
-            map.put("friendRequestList",otherUser.getFriendRequestList());
-            toOtherUser.updateChildren(map);
-            friendDialog.dismiss();
-            Snackbar.make(linearLayout,"Request sent to "+ otherUser.getDisplayName(),BaseTransientBottomBar.LENGTH_SHORT).show();
+        if (otherUser == null || input.length() == 0)
+            Snackbar.make(friendLl, "User doesn't exist", BaseTransientBottomBar.LENGTH_SHORT).show();
+        else {
+            ArrayList<String> friends = otherUser.getFriendRequestList();
+            if (!CheckConnection.isConnectedToInternet(context))
+                CheckConnection.showNoConnectionSnackBar(friendLl);
+            else if (friends.contains(currentUser.getUid()))
+                Snackbar.make(friendLl, "You already sent them a request.", BaseTransientBottomBar.LENGTH_SHORT).show();
+            else if (currentUser.getUid().equals(otherUser.getUid()))
+                Snackbar.make(friendLl, "You cannot send a friend request to yourself!", BaseTransientBottomBar.LENGTH_SHORT).show();
+            else {
+                DatabaseReference toOtherUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users").child(otherUser.getFirebaseId());
+                Map<String, Object> map = new HashMap<>();
+                otherUser.getFriendRequestList().add(currentUser.getUid());
+                map.put("friendRequestList", otherUser.getFriendRequestList());
+                toOtherUser.updateChildren(map);
+                friendDialog.dismiss();
+                Snackbar.make(linearLayout, "Request sent to " + otherUser.getDisplayName(), BaseTransientBottomBar.LENGTH_SHORT).show();
+            }
         }
     };
     private View.OnClickListener bioListener = v -> {
@@ -131,15 +137,15 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
         numHosted = view.findViewById(R.id.profile_host);
         context = getContext();
         layoutInflater = getLayoutInflater();
-        generateUserDetails();
+        new GenerateUsers(getContext()).execute();
         return view;
     }
 
     private void generateUserDetails() {
         if (!CheckConnection.isConnectedToInternet(context))
             CheckConnection.showNoConnectionSnackBar(getView());
-        User user = Database.getCurrentUser();
-        if (user != null) {
+        else {
+            User user = Database.getCurrentUser();
             bio.setText(user.getBio());
             profileName.setText(user.getDisplayName());
             email.setText(user.getEmail());
@@ -159,7 +165,8 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.profile_menu_refresh:
-                generateUserDetails();
+                new GenerateUsers(getContext()).execute();
+                Snackbar.make(getView(), "User refreshed.", BaseTransientBottomBar.LENGTH_SHORT).show();
                 break;
             case R.id.profile_menu_add_friend:
                 generateAddFriendDialog(context,layoutInflater,R.layout.dialog_add_friend);
@@ -175,6 +182,7 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
 
     private void generateEditBioDialog(Context context, LayoutInflater layoutInflater, int layout) {
         dialog = new AlertDialog.Builder(context).create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         View view = layoutInflater.inflate(layout, null);
         changeBio = view.findViewById(R.id.dialog_name_et);
         Button changeBioBtn = view.findViewById(R.id.dialog_name_btn);
@@ -188,6 +196,7 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
 
     private void generateAddFriendDialog(Context context, LayoutInflater layoutInflater, int layout){
         friendDialog = new AlertDialog.Builder(context).create();
+        friendDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         View view = layoutInflater.inflate(layout, null);
         friendLl = view.findViewById(R.id.dialog_friend_ll);
         friendCodeEt = view.findViewById(R.id.dialog_friend_et);
@@ -195,5 +204,19 @@ public class ProfileFragment extends Fragment implements GenerateDialog {
         requestFriendBtn.setOnClickListener(requestFriendListener);
         friendDialog.setView(view);
         friendDialog.show();
+    }
+
+    private class GenerateUsers extends FetchUser {
+
+        GenerateUsers(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            if (this.getDialog().isShowing())
+                this.getDialog().dismiss();
+            generateUserDetails();
+        }
     }
 }

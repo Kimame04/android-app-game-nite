@@ -3,7 +3,6 @@ package com.example.gamenite.models;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Event {
     private String deadline;
@@ -16,6 +15,7 @@ public class Event {
     private int interested;
     private String firebaseId;
     private ArrayList<String> participants = new ArrayList<>();
+    private ArrayList<String> updates = new ArrayList<>();
 
     public Event(String title, String description, int quota, LatLng latLng, String deadline, String uid){
         this.deadline = deadline;
@@ -30,6 +30,17 @@ public class Event {
     }
 
     public Event(){}
+
+    public void addParticipant(String uid) {
+        participants.add(uid);
+        interested++;
+    }
+
+    public void removeParticipant(String uid) {
+        participants.remove(uid);
+        interested--;
+    }
+
 
     public String getDeadline() {
         return deadline;
@@ -105,5 +116,13 @@ public class Event {
 
     public void setParticipants(ArrayList<String> participants) {
         this.participants = participants;
+    }
+
+    public ArrayList<String> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(ArrayList<String> updates) {
+        this.updates = updates;
     }
 }

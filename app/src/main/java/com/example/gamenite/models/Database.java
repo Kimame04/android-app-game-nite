@@ -1,11 +1,9 @@
-package com.example.gamenite.helpers;
+package com.example.gamenite.models;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.gamenite.models.Event;
-import com.example.gamenite.models.User;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.gamenite.helpers.FirebaseInfo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,6 +14,7 @@ import java.util.ArrayList;
 public class Database {
     private static ArrayList<User> users = new ArrayList<>();
     private static ArrayList<Event> events = new ArrayList<>();
+    private static User currentUser;
     private static ChildEventListener userListener = new ChildEventListener() {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -25,7 +24,14 @@ public class Database {
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            //TODO
+            User user = dataSnapshot.getValue(User.class);
+            int index = 0;
+            for (User user1 : users) {
+                if (user.getFirebaseId().equals(dataSnapshot.getKey())) {
+                    index = users.indexOf(user1);
+                }
+            }
+            users.set(index, user);
         }
 
         @Override
@@ -51,7 +57,15 @@ public class Database {
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            //TODO
+            Event event = dataSnapshot.getValue(Event.class);
+            int index = 0;
+            for (Event event1 : events) {
+                if (event1.getFirebaseId().equals(dataSnapshot.getKey())) {
+                    index = events.indexOf(event1);
+                    break;
+                }
+            }
+            events.set(index, event);
         }
 
         @Override
@@ -76,21 +90,38 @@ public class Database {
         eventReference.addChildEventListener(eventListener);
     }
     public static User getCurrentUser(){
-        FirebaseUser firebaseUser = FirebaseInfo.getFirebaseUser();
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+    public static User findUser(String friendCode) {
         for(User user: users){
-            if(user.getUid().equals(firebaseUser.getUid()))
+            if (user.getFriendCode().equals(friendCode))
                 return user;
         }
         return null;
     }
 
-    public static User findUser(String friendCode){
+    public static User findUserbyUid(String uid) {
         for(User user: users){
-            if(user.getFriendCode().equals(friendCode))
+            if (user.getUid().equals(uid))
                 return user;
         }
         return null;
     }
+
+    public static ArrayList<Event> findEventsByUid(String uid) {
+        ArrayList<Event> participatingEvents = new ArrayList<>();
+        for (Event event : events) {
+            if (event.getParticipants().contains(uid))
+                participatingEvents.add(event);
+        }
+        return participatingEvents;
+    }
     public static ArrayList<User> getUsers(){return users;}
     public static ArrayList<Event> getEvents(){return events;}
+
 }

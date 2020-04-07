@@ -5,8 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingVertical="5dp"
+    android:background="@drawable/rounded_corners"
     android:paddingHorizontal="20dp">
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/dialog_bio_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -30,6 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dialog_bio_button"
-        android:textColor="@color/colorSecondary"
+        android:textColor="?android:attr/windowBackground"
         android:layout_gravity="center"/>
 </LinearLayout>

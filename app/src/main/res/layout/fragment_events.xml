@@ -22,13 +22,10 @@
         android:spinnerMode="dropdown"
         android:layout_gravity="center"
         android:elevation="4dp"/>
-    <ScrollView
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/events_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="10dp">
-        <FrameLayout
-            android:id="@+id/events_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </ScrollView>
+        android:scrollbars="vertical" />
 </LinearLayout>
