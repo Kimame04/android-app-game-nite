@@ -13,8 +13,9 @@ public class FirebaseInfo {
     private static User currentUser;
 
     public FirebaseInfo(FirebaseUser firebaseUser, FirebaseDatabase firebaseDatabase){
-        this.firebaseDatabase = firebaseDatabase;
-        this.firebaseUser = firebaseUser;
+        FirebaseInfo.firebaseDatabase = firebaseDatabase;
+        FirebaseInfo.firebaseUser = firebaseUser;
+        Database.initDatabase();
     }
 
     public static FirebaseDatabase getFirebaseDatabase() {

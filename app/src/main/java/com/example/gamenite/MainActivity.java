@@ -6,11 +6,9 @@ import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -33,14 +31,10 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.seismic.ShakeDetector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -141,38 +135,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                boolean hasRegistered = false;
-                ArrayList<User> users = new ArrayList<>();
-                DatabaseReference reference = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
-                reference.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        users.add(dataSnapshot.getValue(User.class));
-                    }
-
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-                for (User user : users) {
-                    if (user.getUid().equals(FirebaseInfo.getFirebaseUser().getUid())) {
-                        hasRegistered = true;
-                        break;
-                    }
-                }
-                if (!hasRegistered) {
+                if (Database.findUserbyUid(firebaseAuth.getCurrentUser().getUid()) == null) {
                     toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
                     User user = new User();
                     String key = toUser.push().getKey();
@@ -215,16 +178,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             new InitFetchUser(this).execute();
             String toWhatFragment = getIntent().getStringExtra("notification_fire");
-            Log.d("test", toWhatFragment + "");
             if (toWhatFragment != null) {
                 switch (toWhatFragment) {
                     case CreateNotification.TO_EVENT_FRAGMENT:
-                        Log.d("test", "ttt");
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventsFragment()).commitAllowingStateLoss();
                         bottomNavigationView.setSelectedItemId(R.id.calendar);
                         break;
                     case CreateNotification.TO_UPDATES_FRAGMENT:
-                        Log.d("test", "test");
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotificationsFragment()).commitAllowingStateLoss();
                         bottomNavigationView.setSelectedItemId(R.id.notifications);
                         break;
