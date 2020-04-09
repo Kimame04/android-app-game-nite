@@ -14,8 +14,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.interfaces.EventClickListener;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.Event;
 
 import java.lang.ref.WeakReference;

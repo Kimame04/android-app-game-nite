@@ -15,10 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
 import com.example.gamenite.adapters.EventUpdateAdapter;
-import com.example.gamenite.models.Database;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.models.Event;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class EventUpdateFragment extends Fragment {
     private Context context;
@@ -47,6 +48,7 @@ public class EventUpdateFragment extends Fragment {
                     updates.add(temp);
                 }
             }
+            Collections.reverse(updates);
             EventUpdateAdapter adapter = new EventUpdateAdapter(updates);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setItemAnimator(new DefaultItemAnimator());

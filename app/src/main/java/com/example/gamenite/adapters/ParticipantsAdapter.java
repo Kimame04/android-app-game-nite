@@ -13,8 +13,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.User;
 import com.google.firebase.database.DatabaseReference;
 

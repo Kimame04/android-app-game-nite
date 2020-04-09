@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -18,9 +19,11 @@ import com.example.gamenite.fragments.ExploreFragment;
 import com.example.gamenite.fragments.NotificationsFragment;
 import com.example.gamenite.fragments.ProfileFragment;
 import com.example.gamenite.fragments.SettingsFragment;
+import com.example.gamenite.helpers.CreateNotification;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
+import com.example.gamenite.models.CheckUpdateService;
 import com.example.gamenite.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -43,15 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseDatabase firebaseDatabase;
     private FirebaseAuth firebaseAuth;
-    private FirebaseAuth.AuthStateListener authStateListener;
+    private static final int RC_SIGN_IN = 100;
     private FirebaseUser firebaseUser;
-    private FirebaseInfo firebaseInfo;
     private DatabaseReference toUser;
 
     private SensorManager sensorManager;
     private ShakeDetector shakeDetector;
-
-    private static final int RC_SIGN_IN = 1;
+    private static FirebaseAuth.AuthStateListener authStateListener;
     private BottomNavigationView bottomNavigationView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener =
@@ -86,15 +87,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        context = getApplicationContext();
-
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
-
-        frameLayout = findViewById(R.id.fragment_container);
-        relativeLayout = findViewById(R.id.main_rl);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -102,35 +94,7 @@ public class MainActivity extends AppCompatActivity {
         authStateListener = firebaseAuth -> {
             if (firebaseAuth.getCurrentUser() != null) {
                 firebaseUser = firebaseAuth.getCurrentUser();
-                firebaseInfo = new FirebaseInfo(firebaseUser,firebaseDatabase);
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                if (!sharedPreferences.getBoolean("onboarding_complete", false)) {
-                    startActivity(new Intent(this, OnboardingActivity.class));
-                    finish();
-                } else {
-                    Database.initDatabase();
-                    new FetchUser(this).execute();
-                    switch (sharedPreferences.getString("settings_startup_fragment", "")) {
-                        case "Profile":
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commitAllowingStateLoss();
-                            bottomNavigationView.setSelectedItemId(R.id.profile);
-                            break;
-                        case "My Events":
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventsFragment()).commitAllowingStateLoss();
-                            bottomNavigationView.setSelectedItemId(R.id.calendar);
-                            break;
-                        case "Settings":
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commitAllowingStateLoss();
-                            bottomNavigationView.setSelectedItemId(R.id.settings);
-                            break;
-                        case "Notifications":
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotificationsFragment());
-                        default:
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExploreFragment()).commitAllowingStateLoss();
-                            bottomNavigationView.setSelectedItemId(R.id.explore);
-                            break;
-                    }
-                }
+                initActivity();
             } else {
                 startActivityForResult(
                         AuthUI.getInstance()
@@ -172,12 +136,17 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
-                if ((Database.findUserbyUid(FirebaseInfo.getFirebaseUser().getUid()) == null)) {
+                initActivity();
+                if (FirebaseInfo.getFirebaseUser() == null) {
+                    toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
                     User user = new User();
                     String key = toUser.push().getKey();
                     user.setFirebaseId(key);
                     toUser.child(key).setValue(user);
+                    CreateNotification.createNotificationChannel(CreateNotification.CHANNEL_ONE, "Admin", "Warmly introduce them in the app", this);
+                    CreateNotification.createNotification(CreateNotification.CHANNEL_ONE,
+                            this, "Registration complete!", "Welcome to Game Nite!"
+                            , "Welcome to Game Nite!", 1, CreateNotification.GROUP_ONE, CreateNotification.OTHERS);
                 }
                 Snackbar.make(relativeLayout, "Successfully signed in!", BaseTransientBottomBar.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
@@ -185,7 +154,83 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+
     }
 
+    private void initActivity() {
+        setContentView(R.layout.activity_main);
+        context = getApplicationContext();
 
+        CreateNotification.createNotificationGroup(CreateNotification.GROUP_ONE, "Words of Encouragement", this);
+        CreateNotification.createNotificationGroup(CreateNotification.GROUP_TWO, "Event Updates", this);
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+
+        frameLayout = findViewById(R.id.fragment_container);
+        relativeLayout = findViewById(R.id.main_rl);
+        firebaseUser = firebaseAuth.getCurrentUser();
+        new FirebaseInfo(firebaseUser, firebaseDatabase);
+        Database.initDatabase();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!sharedPreferences.getBoolean("onboarding_complete", false)) {
+            startActivity(new Intent(this, OnboardingActivity.class));
+            finish();
+        } else {
+            new InitFetchUser(this).execute();
+            String toWhatFragment = getIntent().getStringExtra("notification_fire");
+            Log.d("test", toWhatFragment + "");
+            if (toWhatFragment != null) {
+                switch (toWhatFragment) {
+                    case CreateNotification.TO_EVENT_FRAGMENT:
+                        Log.d("test", "ttt");
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventsFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.calendar);
+                        break;
+                    case CreateNotification.TO_UPDATES_FRAGMENT:
+                        Log.d("test", "test");
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotificationsFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.notifications);
+                        break;
+                }
+            } else {
+                switch (sharedPreferences.getString("settings_startup_fragment", "")) {
+                    case "Profile":
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.profile);
+                        break;
+                    case "My Events":
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventsFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.calendar);
+                        break;
+                    case "Settings":
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.settings);
+                        break;
+                    case "Notifications":
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NotificationsFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.notifications);
+                        break;
+                    default:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExploreFragment()).commitAllowingStateLoss();
+                        bottomNavigationView.setSelectedItemId(R.id.explore);
+                        break;
+                }
+            }
+        }
+    }
+
+    private class InitFetchUser extends FetchUser {
+
+        public InitFetchUser(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            if (getDialog().isShowing())
+                getDialog().dismiss();
+            context.startService(new Intent(context, CheckUpdateService.class));
+        }
+    }
 }

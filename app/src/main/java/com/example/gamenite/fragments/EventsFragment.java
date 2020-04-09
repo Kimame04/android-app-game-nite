@@ -34,8 +34,8 @@ import com.example.gamenite.R;
 import com.example.gamenite.adapters.EventAdapter;
 import com.example.gamenite.adapters.ParticipantsAdapter;
 import com.example.gamenite.helpers.CheckConnection;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -143,6 +143,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                 String key = toEvents.getKey();
                 event.setFirebaseId(key);
                 toEvents.setValue(event);
+                new FetchEvents(pos, getContext()).execute();
             }
         }
     };
@@ -291,52 +292,61 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                                 Snackbar.make(v1, "Cannot submit an empty field", BaseTransientBottomBar.LENGTH_SHORT).show();
                             else {
                                 Map<String, Object> map = new HashMap<>();
-                                event.getUpdates().add(editText.getText().toString());
+                                event.getUpdates().add(editText.getText().toString() + "\nTimestamp: " + now.format(dateTimeFormatter));
                                 map.put("updates", event.getUpdates());
                                 eventsReference.updateChildren(map);
                                 Snackbar.make(getView(), "Success!", BaseTransientBottomBar.LENGTH_SHORT).show();
                                 updateDialog.dismiss();
                             }
                         });
+                        new FetchEvents(pos, getContext()).execute();
                         updateDialog.setView(view1);
                         updateDialog.show();
                         break;
                     case R.id.events_interested:
-                        if (hasPassed) { //shown when the event has concluded
+                        if (hasPassed && isOrganiser) {
+                            Map<String, Object> toOrganiser = new HashMap<>();
+                            toOrganiser.put("numHosted", currentUser.getNumHosted() + 1);
+                            toOrganiser.put("numParticipated", currentUser.getNumParticipated() + 1);
+                            organiserReference.updateChildren(toOrganiser);
+                            Map<String, Object> toEvent = new HashMap<>();
+                            event.removeParticipant(currentUser.getUid());
+                            toEvent.put("participants", event.getParticipants());
+                            eventsReference.updateChildren(toEvent);
+                            if (event.getParticipants().size() == 0)
+                                eventsReference.removeValue();
+                            new FetchEvents(pos, getContext()).execute();
+                        } else if (hasPassed) { //shown when the event has concluded
                             AlertDialog rateDialog = new AlertDialog.Builder(context).create();
                             rateDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                            if (!isOrganiser) {
-                                View view3 = layoutInflater.inflate(R.layout.dialog_rate_event, null);
-                                Button submit = view.findViewById(R.id.dialog_rate_submit);
-                                RatingBar ratingBar = view.findViewById(R.id.dialog_rate_ratingbar);
-                                TextView number = view.findViewById(R.id.dialog_rate_number);
-                                submit.setOnClickListener(v1 -> {
-                                    Map<String, Object> toOrganiser = new HashMap<>();
-                                    Map<String, Object> toUser = new HashMap<>();
-                                    Map<String, Object> toEvent = new HashMap<>();
-                                    toOrganiser.put("numReviews", organiser.getNumReviews() + 1);
-                                    toOrganiser.put("totalRating", organiser.getTotalRating() + (double) ratingBar.getRating());
-                                    toOrganiser.put("numHosted", organiser.getNumHosted() + 1);
-                                    toOrganiser.put("numParticipated", organiser.getNumParticipated() + 1);
-                                    organiserReference.updateChildren(toOrganiser);
-                                    toUser.put("numParticipated", currentUser.getNumParticipated() + 1);
-                                    userReference.updateChildren(toUser);
-                                    event.removeParticipant(currentUser.getUid());
-                                    toEvent.put("participants", event.getParticipants());
-                                    eventsReference.updateChildren(toEvent);
-                                    if (event.getParticipants().size() == 0)
-                                        eventsReference.removeValue();
-                                    Snackbar.make(getView(), "Event rated successfully!", BaseTransientBottomBar.LENGTH_SHORT).show();
-                                    rateDialog.setView(view3);
-                                    rateDialog.dismiss();
-                                });
-                                ratingBar.setOnRatingBarChangeListener((ratingBar1, rating, fromUser) -> number.setText(rating + ""));
-                                rateDialog.setView(view);
-                                rateDialog.show();
-                            } else {
+                            View view3 = layoutInflater.inflate(R.layout.dialog_rate_event, null);
+                            Button submit = view3.findViewById(R.id.dialog_rate_submit);
+                            RatingBar ratingBar = view3.findViewById(R.id.dialog_rate_ratingbar);
+                            TextView number = view3.findViewById(R.id.dialog_rate_number);
+                            submit.setOnClickListener(v1 -> {
+                                Map<String, Object> toOrganiser = new HashMap<>();
+                                Map<String, Object> toUser = new HashMap<>();
+                                Map<String, Object> toEvent = new HashMap<>();
+                                toOrganiser.put("numReviews", organiser.getNumReviews() + 1);
+                                toOrganiser.put("totalRating", organiser.getTotalRating() + (double) ratingBar.getRating());
+                                organiserReference.updateChildren(toOrganiser);
+                                toUser.put("numParticipated", currentUser.getNumParticipated() + 1);
+                                userReference.updateChildren(toUser);
+                                event.removeParticipant(currentUser.getUid());
+                                toEvent.put("participants", event.getParticipants());
+                                eventsReference.updateChildren(toEvent);
+                                if (event.getParticipants().size() == 0)
+                                    eventsReference.removeValue();
+                                new FetchEvents(pos, getContext()).execute();
+                                Snackbar.make(getView(), "Event rated successfully!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                rateDialog.setView(view3);
+                                rateDialog.dismiss();
+                            });
+                            ratingBar.setOnRatingBarChangeListener((ratingBar1, rating, fromUser) -> number.setText(rating + ""));
+                            rateDialog.setView(view3);
+                            rateDialog.show();
 
-                            }
                         } else if (isOrganiser) { //shown if organiser wants to cancel the event
                             new MaterialAlertDialogBuilder(context)
                                     .setTitle("Cancel event")
@@ -347,6 +357,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                                         toUser.put("numReviews", currentUser.getNumReviews() + 1);
                                         userReference.updateChildren(toUser);
                                         dialog.dismiss();
+                                        new FetchEvents(pos, getContext()).execute();
                                         Snackbar.make(linearLayout, "Event cancelled.", BaseTransientBottomBar.LENGTH_LONG).show();
                                     })).setNegativeButton("No", null).show();
                         } else if (deadline.minusHours(24).isBefore(now)) { //shown if user backs out 24 hours before date
@@ -361,6 +372,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                                         toEvent.put("interested", event.getParticipants().size());
                                         toEvent.put("participants", event.getParticipants());
                                         eventsReference.updateChildren(toEvent);
+                                        new FetchEvents(pos, getContext()).execute();
                                         Snackbar.make(linearLayout, "Backed out successfully.", BaseTransientBottomBar.LENGTH_SHORT).show();
                                     })).setNegativeButton("No", null).show();
                         } else { //show regular quit procedure
@@ -372,6 +384,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                                         toEvent.put("interested", event.getParticipants().size());
                                         toEvent.put("participants", event.getParticipants());
                                         eventsReference.updateChildren(toEvent);
+                                        new FetchEvents(pos, getContext()).execute();
                                         Snackbar.make(getView(), "You have successfully left the event.", BaseTransientBottomBar.LENGTH_SHORT).show();
                                     })).setNegativeButton("No", null).show();
                         }

@@ -1,9 +1,10 @@
-package com.example.gamenite.models;
+package com.example.gamenite.helpers;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.gamenite.helpers.FirebaseInfo;
+import com.example.gamenite.models.Event;
+import com.example.gamenite.models.User;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +30,7 @@ public class Database {
             for (User user1 : users) {
                 if (user.getFirebaseId().equals(dataSnapshot.getKey())) {
                     index = users.indexOf(user1);
+                    break;
                 }
             }
             users.set(index, user);
@@ -84,6 +86,8 @@ public class Database {
         public void onCancelled(@NonNull DatabaseError databaseError) { }
     };
     public static void initDatabase(){
+        users.clear();
+        events.clear();
         DatabaseReference userReference = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
         DatabaseReference eventReference = FirebaseInfo.getFirebaseDatabase().getReference().child("Events");
         userReference.addChildEventListener(userListener);

@@ -12,6 +12,9 @@
     <uses-feature
         android:name="android.software.leanback"
         android:required="true" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -47,7 +50,9 @@
             android:name=".OnboardingActivity"
             android:enabled="true"
             android:exported="true"
-            android:theme="@style/Theme.Leanback.Onboarding"></activity>
+            android:theme="@style/Theme.Leanback.Onboarding" />
+
+        <service android:name=".models.CheckUpdateService" />
     </application>
 
 </manifest>

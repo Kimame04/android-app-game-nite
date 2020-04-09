@@ -22,9 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
 import com.example.gamenite.adapters.ExploreAdapter;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FetchEvents;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -131,7 +131,8 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                exploreAdapter.getFilter().filter(newText);
+                if (exploreAdapter != null)
+                    exploreAdapter.getFilter().filter(newText);
                 return false;
             }
         });

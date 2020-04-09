@@ -22,12 +22,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
+import com.example.gamenite.adapters.ParticipantsAdapter;
 import com.example.gamenite.helpers.CheckConnection;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.User;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -52,6 +56,7 @@ public class ProfileFragment extends Fragment {
     private TextView numHosted;
     private TextView numPartipated;
     private TextView charCounter;
+    private TextView friendsTitle;
     private Button editBio;
     private EditText changeBio;
     private Context context;
@@ -60,6 +65,23 @@ public class ProfileFragment extends Fragment {
     private AlertDialog friendDialog;
     private EditText friendCodeEt;
     private static final int maxChars = 240;
+    private View.OnClickListener viewFriendListener = v -> {
+        androidx.appcompat.app.AlertDialog friendsDialog = new androidx.appcompat.app.AlertDialog.Builder(getContext()).create();
+        friendsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        View view = getLayoutInflater().inflate(R.layout.dialog_participants, null);
+        RecyclerView rv = view.findViewById(R.id.dialog_participants_rv);
+        TextView title = view.findViewById(R.id.dialog_participants_title);
+        title.setText("Friends");
+        ParticipantsAdapter adapter = new ParticipantsAdapter(Database.getCurrentUser().getFriendList());
+        rv.setLayoutManager(new LinearLayoutManager(context));
+        rv.setItemAnimator(new DefaultItemAnimator());
+        rv.setAdapter(adapter);
+        Button close = view.findViewById(R.id.dialog_participants_btn);
+        close.setOnClickListener(v1 -> friendsDialog.dismiss());
+        friendsDialog.setView(view);
+        friendsDialog.show();
+    };
+
     private View.OnClickListener requestFriendListener = v -> {
         String input = friendCodeEt.getText().toString();
         User currentUser = Database.getCurrentUser();
@@ -137,6 +159,7 @@ public class ProfileFragment extends Fragment {
         numHosted = view.findViewById(R.id.profile_host);
         context = getContext();
         layoutInflater = getLayoutInflater();
+        friendsTitle = view.findViewById(R.id.profile_friends_title);
         new GenerateUsers(getContext()).execute();
         return view;
     }
@@ -158,6 +181,7 @@ public class ProfileFragment extends Fragment {
             numHosted.setText(user.getNumHosted() + "");
             numPartipated.setText(user.getNumParticipated() + "");
             editBio.setOnClickListener(bioListener);
+            friendsTitle.setOnClickListener(viewFriendListener);
         }
     }
 
@@ -166,7 +190,6 @@ public class ProfileFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.profile_menu_refresh:
                 new GenerateUsers(getContext()).execute();
-                Snackbar.make(getView(), "User refreshed.", BaseTransientBottomBar.LENGTH_SHORT).show();
                 break;
             case R.id.profile_menu_add_friend:
                 generateAddFriendDialog(context,layoutInflater,R.layout.dialog_add_friend);
@@ -217,6 +240,7 @@ public class ProfileFragment extends Fragment {
             if (this.getDialog().isShowing())
                 this.getDialog().dismiss();
             generateUserDetails();
+            Snackbar.make(getView(), "User refreshed.", BaseTransientBottomBar.LENGTH_SHORT).show();
         }
     }
 }

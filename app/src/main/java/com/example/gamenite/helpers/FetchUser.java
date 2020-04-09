@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.User;
 
 public class FetchUser extends AsyncTask<Void, Void, User> {
@@ -16,18 +15,14 @@ public class FetchUser extends AsyncTask<Void, Void, User> {
     }
 
     private User fetchCurrentUser() {
-        for (User user : Database.getUsers()) {
-            if (user.getUid().equals(FirebaseInfo.getFirebaseUser().getUid()))
-                return user;
-        }
-        return null;
+        return Database.findUserbyUid(FirebaseInfo.getFirebaseUser().getUid());
     }
 
     @Override
     protected void onPreExecute() {
         dialog = new ProgressDialog(context);
         dialog.setMessage("Loading user, please wait...");
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
         dialog.show();
     }
 
@@ -42,8 +37,8 @@ public class FetchUser extends AsyncTask<Void, Void, User> {
 
     @Override
     protected void onPostExecute(User user) {
-        if (dialog.isShowing())
-            dialog.dismiss();
+        if (this.dialog.isShowing())
+            this.dialog.dismiss();
     }
 
     public ProgressDialog getDialog() {

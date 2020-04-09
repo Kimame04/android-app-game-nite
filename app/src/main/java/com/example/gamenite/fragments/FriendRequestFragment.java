@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
 import com.example.gamenite.adapters.FriendRequestAdapter;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.User;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;

@@ -12,8 +12,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gamenite.R;
+import com.example.gamenite.helpers.Database;
 import com.example.gamenite.interfaces.EventClickListener;
-import com.example.gamenite.models.Database;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
 
@@ -54,7 +54,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         String displayName = Database.findUserbyUid(event.getUid()).getDisplayName();
         boolean isOrganiser = event.getUid().equals(currentUser.getUid());
         boolean hasPassed = LocalDateTime.parse(event.getDeadline(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")).isBefore(LocalDateTime.now());
-        if (hasPassed) {
+        if (hasPassed && isOrganiser) {
+            holder.cancel.setText("Conclude this event");
+            holder.location.setVisibility(View.GONE);
+        } else if (hasPassed) {
             holder.cancel.setText("Rate this event");
             holder.location.setVisibility(View.GONE);
         } else if (isOrganiser) {
