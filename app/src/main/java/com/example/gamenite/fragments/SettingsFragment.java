@@ -1,7 +1,9 @@
 package com.example.gamenite.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,6 +46,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setHasOptionsMenu(true);
         context = getContext();
         bindSummaryValue(findPreference("settings_startup_fragment"));
+        Preference notificationsPref = findPreference("settings_notifications");
+        notificationsPref.setOnPreferenceClickListener(preference -> {
+            Intent toSettings = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            toSettings.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+            startActivity(toSettings);
+            return true;
+        });
     }
 
     @Override

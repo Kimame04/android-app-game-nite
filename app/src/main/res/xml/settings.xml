@@ -17,4 +17,10 @@
             android:summaryOn="Enjoy!"
             android:title="Animations" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Notifications">
+        <Preference
+            android:key="settings_notifications"
+            android:summary="Go to app notifications settings"
+            android:title="Notification Settings" />
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -373,7 +373,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                                         toEvent.put("participants", event.getParticipants());
                                         eventsReference.updateChildren(toEvent);
                                         new FetchEvents(pos, getContext()).execute();
-                                        Snackbar.make(linearLayout, "Backed out successfully.", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                        Snackbar.make(getView(), "Backed out successfully.", BaseTransientBottomBar.LENGTH_SHORT).show();
                                     })).setNegativeButton("No", null).show();
                         } else { //show regular quit procedure
                             new MaterialAlertDialogBuilder(context).setTitle("Quit event")
