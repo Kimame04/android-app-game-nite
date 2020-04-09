@@ -73,4 +73,8 @@
     <string name="title_activity_onboarding">OnboardingActivity</string>
     <string name="update">Make an update</string>
     <string name="submit">Submit</string>
+    <string name="achievements_show">Show Achievements</string>
+    <string name="achievements_hide">Hide Achievements</string>
+    <string name="available_tags">Available tags</string>
+    <string name="my_tags">My Tags</string>
 </resources>

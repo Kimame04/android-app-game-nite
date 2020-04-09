@@ -17,6 +17,7 @@ public class User {
     private int numFriends;
     private int numHosted;
     private int numParticipated;
+    private ArrayList<String> tagsList = new ArrayList<>();
     private ArrayList<String> friendRequestList = new ArrayList<>();
     private ArrayList<String> friendList = new ArrayList<>();
     public User(){

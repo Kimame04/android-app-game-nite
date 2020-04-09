@@ -33,6 +33,7 @@ import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
 import com.example.gamenite.models.User;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +65,8 @@ public class ProfileFragment extends Fragment {
     private AlertDialog dialog;
     private AlertDialog friendDialog;
     private EditText friendCodeEt;
+    private Button editTags;
+    private ChipGroup chipGroup;
     private static final int maxChars = 240;
     private View.OnClickListener viewFriendListener = v -> {
         androidx.appcompat.app.AlertDialog friendsDialog = new androidx.appcompat.app.AlertDialog.Builder(getContext()).create();

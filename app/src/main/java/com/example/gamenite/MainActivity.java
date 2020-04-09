@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -32,10 +33,14 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.seismic.ShakeDetector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -136,8 +141,38 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                initActivity();
-                if (FirebaseInfo.getFirebaseUser() == null) {
+                boolean hasRegistered = false;
+                ArrayList<User> users = new ArrayList<>();
+                DatabaseReference reference = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
+                reference.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        users.add(dataSnapshot.getValue(User.class));
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+                for (User user : users) {
+                    if (user.getUid().equals(FirebaseInfo.getFirebaseUser().getUid())) {
+                        hasRegistered = true;
+                        break;
+                    }
+                }
+                if (!hasRegistered) {
                     toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
                     User user = new User();
                     String key = toUser.push().getKey();
@@ -148,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                             this, "Registration complete!", "Welcome to Game Nite!"
                             , "Welcome to Game Nite!", 1, CreateNotification.GROUP_ONE, CreateNotification.OTHERS);
                 }
+                initActivity();
                 Snackbar.make(relativeLayout, "Successfully signed in!", BaseTransientBottomBar.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 Snackbar.make(relativeLayout, "Sign in cancelled.", BaseTransientBottomBar.LENGTH_SHORT).show();
