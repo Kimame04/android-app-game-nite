@@ -211,9 +211,10 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
         ChipGroup availableChips = view.findViewById(R.id.dialog_event_available_tags);
         ChipGroup myChips = view.findViewById(R.id.dialog_event_chosen_tags);
         for (Chip chip : Database.getChips()) {
-            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(getContext());
+            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(context);
             c.setCheckable(true);
             c.setText(chip.getName());
+            availableChips.addView(c);
             c.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     selectedChips.add(chip);

@@ -6,16 +6,29 @@ import android.os.AsyncTask;
 
 import com.example.gamenite.models.User;
 
+import java.util.ArrayList;
+
 public class FetchUser extends AsyncTask<Void, Void, User> {
     private Context context;
     private ProgressDialog dialog;
+    private ArrayList<User> users;
 
     public FetchUser(Context context) {
         this.context = context;
     }
 
     private User fetchCurrentUser() {
-        return Database.findUserbyUid(FirebaseInfo.getFirebaseUser().getUid());
+        /*for(Iterator<User> iterator = users.iterator();iterator.hasNext();){
+            User user = iterator.next();
+            if (user.getUid().equals(FirebaseInfo.getFirebaseUser().getUid()))
+                return user;
+        }*/
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            if (user.getUid().equals(FirebaseInfo.getFirebaseUser().getUid()))
+                return user;
+        }
+        return null;
     }
 
     @Override
@@ -24,6 +37,7 @@ public class FetchUser extends AsyncTask<Void, Void, User> {
         dialog.setMessage("Loading user, please wait...");
         dialog.setCancelable(true);
         dialog.show();
+        users = Database.getUsers();
     }
 
     @Override

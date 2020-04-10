@@ -193,43 +193,6 @@
             android:layout_marginVertical="10dp"
             android:background="@color/colorPrimary" />
 
-        <LinearLayout
-            android:id="@+id/profile_types"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/profile_tags_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="User tags"
-                android:textColor="@color/colorPrimary"
-                android:textSize="20sp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/profile_edit_tags"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_edit_black_24dp" />
-        </LinearLayout>
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/profile_chips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dp" />
-
-        <View
-            android:layout_width="100dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center"
-            android:layout_marginVertical="10dp"
-            android:background="@color/colorPrimary" />
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/profile_add_tag"
             style="@style/Widget.MaterialComponents.Button.TextButton"

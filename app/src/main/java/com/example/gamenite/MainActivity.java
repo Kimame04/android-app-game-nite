@@ -22,7 +22,6 @@ import com.example.gamenite.helpers.CreateNotification;
 import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
-import com.example.gamenite.models.CheckUpdateService;
 import com.example.gamenite.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         authStateListener = firebaseAuth -> {
             if (firebaseAuth.getCurrentUser() != null) {
                 firebaseUser = firebaseAuth.getCurrentUser();
+                new FirebaseInfo(firebaseUser, firebaseDatabase);
                 initActivity();
             } else {
                 startActivityForResult(
@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     uid = firebaseAuth.getCurrentUser().getUid();
                 }
                 if (Database.findUserbyUid(uid) == null) {
+                    new FirebaseInfo(firebaseAuth.getCurrentUser(), firebaseDatabase);
                     toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
                     User user = new User();
                     String key = toUser.push().getKey();
@@ -151,10 +152,7 @@ public class MainActivity extends AppCompatActivity {
                             , "Welcome to Game Nite!", 1, CreateNotification.GROUP_ONE, CreateNotification.OTHERS);
                     startActivity(new Intent(this, OnboardingActivity.class));
                     finish();
-
                 }
-                initActivity();
-                Snackbar.make(relativeLayout, "Successfully signed in!", BaseTransientBottomBar.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 Snackbar.make(relativeLayout, "Sign in cancelled.", BaseTransientBottomBar.LENGTH_SHORT).show();
                 finish();
@@ -175,12 +173,20 @@ public class MainActivity extends AppCompatActivity {
 
         frameLayout = findViewById(R.id.fragment_container);
         relativeLayout = findViewById(R.id.main_rl);
-        firebaseUser = firebaseAuth.getCurrentUser();
-        new FirebaseInfo(firebaseUser, firebaseDatabase);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            new InitFetchUser(this).execute();
-            String toWhatFragment = getIntent().getStringExtra("notification_fire");
-            if (toWhatFragment != null) {
+        new InitFetchUser(this).execute();
+    }
+
+    private class InitFetchUser extends FetchUser {
+
+        public InitFetchUser(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            if (getDialog().isShowing())
+                getDialog().dismiss();
+            /*if (toWhatFragment != null) {
                 switch (toWhatFragment) {
                     case CreateNotification.TO_EVENT_FRAGMENT:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new EventsFragment()).commitAllowingStateLoss();
@@ -191,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
                         bottomNavigationView.setSelectedItemId(R.id.notifications);
                         break;
                 }
-            } else {
-                switch (sharedPreferences.getString("settings_startup_fragment", "")) {
+            } else {*/
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            switch (sharedPreferences.getString("settings_startup_fragment", "")) {
                     case "Profile":
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commitAllowingStateLoss();
                         bottomNavigationView.setSelectedItemId(R.id.profile);
@@ -213,22 +220,8 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ExploreFragment()).commitAllowingStateLoss();
                         bottomNavigationView.setSelectedItemId(R.id.explore);
                         break;
-                }
 
             }
-    }
-
-    private class InitFetchUser extends FetchUser {
-
-        public InitFetchUser(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onPostExecute(User user) {
-            if (getDialog().isShowing())
-                getDialog().dismiss();
-            context.startService(new Intent(context, CheckUpdateService.class));
         }
     }
 }

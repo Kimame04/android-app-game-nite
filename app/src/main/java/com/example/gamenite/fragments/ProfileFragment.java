@@ -34,7 +34,6 @@ import com.example.gamenite.helpers.FetchUser;
 import com.example.gamenite.helpers.FirebaseInfo;
 import com.example.gamenite.models.Chip;
 import com.example.gamenite.models.User;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DatabaseReference;
@@ -66,8 +65,6 @@ public class ProfileFragment extends Fragment {
     private AlertDialog dialog;
     private AlertDialog friendDialog;
     private EditText friendCodeEt;
-    private Button editTags;
-    private ChipGroup chipGroup;
     private static final int maxTagChars = 20;
     private static final int maxChars = 240;
     private Button addTag;
@@ -118,51 +115,6 @@ public class ProfileFragment extends Fragment {
         });
         addTagDialog.setView(view);
         addTagDialog.show();
-    };
-    private View.OnClickListener editTagListener = v -> {
-        androidx.appcompat.app.AlertDialog editTagDialog = new androidx.appcompat.app.AlertDialog.Builder(getContext()).create();
-        editTagDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        View view = getLayoutInflater().inflate(R.layout.dialog_change_tags, null);
-        ChipGroup availableTags = view.findViewById(R.id.dialog_tags_cg);
-        ChipGroup myTags = view.findViewById(R.id.dialog_tags_cg_2);
-        User currentUser = Database.getCurrentUser();
-        ArrayList<Chip> myChips = currentUser.getTagsList();
-        for (Chip chip : Database.getChips()) {
-            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(getContext());
-            c.setText(chip.getName());
-            c.setCheckable(true);
-            availableTags.addView(c);
-            for (Chip chip1 : myChips) {
-                if (chip1.getName().equals(chip.getName())) {
-                    c.setChecked(true);
-                    availableTags.removeView(c);
-                    myTags.addView(c);
-                }
-            }
-            c.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    availableTags.removeView(c);
-                    myTags.addView(c);
-                    currentUser.getTagsList().add(chip);
-                } else {
-                    myTags.removeView(c);
-                    availableTags.addView(c);
-                    currentUser.getTagsList().remove(chip);
-                }
-            });
-        }
-        Button submitUpdatedTags = view.findViewById(R.id.dialog_tags_btn);
-        submitUpdatedTags.setOnClickListener(v1 -> {
-            DatabaseReference toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users").child(currentUser.getFirebaseId());
-            Map<String, Object> map = new HashMap<>();
-            map.put("tagsList", currentUser.getTagsList());
-            toUser.updateChildren(map);
-            editTagDialog.dismiss();
-            generateUserDetails();
-            Snackbar.make(getView(), "User tags updated!", BaseTransientBottomBar.LENGTH_SHORT).show();
-        });
-        editTagDialog.setView(view);
-        editTagDialog.show();
     };
     private View.OnClickListener viewFriendListener = v -> {
         androidx.appcompat.app.AlertDialog friendsDialog = new androidx.appcompat.app.AlertDialog.Builder(getContext()).create();
@@ -260,8 +212,6 @@ public class ProfileFragment extends Fragment {
         layoutInflater = getLayoutInflater();
         friendsTitle = view.findViewById(R.id.profile_friends_title);
         addTag = view.findViewById(R.id.profile_add_tag);
-        editTags = view.findViewById(R.id.profile_edit_tags);
-        chipGroup = view.findViewById(R.id.profile_chips);
         new GenerateUsers(getContext()).execute();
         return view;
     }
@@ -285,15 +235,6 @@ public class ProfileFragment extends Fragment {
             editBio.setOnClickListener(bioListener);
             friendsTitle.setOnClickListener(viewFriendListener);
             addTag.setOnClickListener(addTagListener);
-            editTags.setOnClickListener(editTagListener);
-            chipGroup.removeAllViews();
-            for (Chip chip : user.getTagsList()) {
-                com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(getContext());
-                c.setText(chip.getName());
-                c.setCheckable(false);
-                c.setClickable(false);
-                chipGroup.addView(c);
-            }
         }
     }
 

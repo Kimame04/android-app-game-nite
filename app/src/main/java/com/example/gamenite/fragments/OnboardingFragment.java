@@ -3,6 +3,7 @@ package com.example.gamenite.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.leanback.app.OnboardingSupportFragment;
+import androidx.preference.PreferenceManager;
 
 import com.example.gamenite.MainActivity;
 import com.example.gamenite.R;
@@ -98,6 +100,9 @@ public class OnboardingFragment extends OnboardingSupportFragment {
     @Override
     protected void onFinishFragment() {
         super.onFinishFragment();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .edit();
+        editor.putBoolean("onboarding_complete", true).apply();
         startActivity(new Intent(getContext(), MainActivity.class));
         getActivity().finish();
     }

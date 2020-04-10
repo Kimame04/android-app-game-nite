@@ -1,5 +1,6 @@
 package com.example.gamenite.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,12 +84,14 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         return eventList.size();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final ExploreAdapter.ViewHolder holder, int position) {
         Event event = eventList.get(position);
+        String displayName = Database.findUserbyUid(event.getUid()).getDisplayName();
         holder.title.setText(event.getTitle());
         holder.description.setText(event.getDescription());
-        holder.status.setText("Date: " + event.getDeadline() + "\n" + (event.getQuota() - event.getInterested()) + " slots remaining" + "\n" + "By: " + Database.findUserbyUid(event.getUid()).getDisplayName());
+        holder.status.setText("Date: " + event.getDeadline() + "\n" + (event.getQuota() - event.getInterested()) + " slots remaining" + "\n" + "By: " + displayName);
         holder.chipGroup.removeAllViews();
         for (Chip chip : event.getChips()) {
             com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(context);
