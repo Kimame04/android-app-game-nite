@@ -135,7 +135,11 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                if (Database.findUserbyUid(firebaseAuth.getCurrentUser().getUid()) == null) {
+                String uid = null;
+                while (uid == null) {
+                    uid = firebaseAuth.getCurrentUser().getUid();
+                }
+                if (Database.findUserbyUid(uid) == null) {
                     toUser = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
                     User user = new User();
                     String key = toUser.push().getKey();
@@ -145,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
                     CreateNotification.createNotification(CreateNotification.CHANNEL_ONE,
                             this, "Registration complete!", "Welcome to Game Nite!"
                             , "Welcome to Game Nite!", 1, CreateNotification.GROUP_ONE, CreateNotification.OTHERS);
+                    startActivity(new Intent(this, OnboardingActivity.class));
+                    finish();
+
                 }
                 initActivity();
                 Snackbar.make(relativeLayout, "Successfully signed in!", BaseTransientBottomBar.LENGTH_SHORT).show();
@@ -170,12 +177,7 @@ public class MainActivity extends AppCompatActivity {
         relativeLayout = findViewById(R.id.main_rl);
         firebaseUser = firebaseAuth.getCurrentUser();
         new FirebaseInfo(firebaseUser, firebaseDatabase);
-        Database.initDatabase();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.getBoolean("onboarding_complete", false)) {
-            startActivity(new Intent(this, OnboardingActivity.class));
-            finish();
-        } else {
             new InitFetchUser(this).execute();
             String toWhatFragment = getIntent().getStringExtra("notification_fire");
             if (toWhatFragment != null) {
@@ -212,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
                         bottomNavigationView.setSelectedItemId(R.id.explore);
                         break;
                 }
+
             }
-        }
     }
 
     private class InitFetchUser extends FetchUser {
