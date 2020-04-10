@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gamenite.R;
 import com.example.gamenite.helpers.Database;
 import com.example.gamenite.interfaces.EventClickListener;
+import com.example.gamenite.models.Chip;
 import com.example.gamenite.models.Event;
+import com.google.android.material.chip.ChipGroup;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -37,8 +39,15 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 for (Event event : eventListFull) {
+                    boolean doesTagHaveIt = false;
+                    for (Chip chip : event.getChips()) {
+                        if (chip.getName().toLowerCase().contains(filterPattern)) {
+                            doesTagHaveIt = true;
+                            break;
+                        }
+                    }
                     if (event.getTitle().toLowerCase().contains(filterPattern)
-                            || event.getDescription().toLowerCase().contains(filterPattern))
+                            || event.getDescription().toLowerCase().contains(filterPattern) || doesTagHaveIt)
                         filteredEvents.add(event);
                 }
             }
@@ -80,6 +89,15 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         holder.title.setText(event.getTitle());
         holder.description.setText(event.getDescription());
         holder.status.setText("Date: " + event.getDeadline() + "\n" + (event.getQuota() - event.getInterested()) + " slots remaining" + "\n" + "By: " + Database.findUserbyUid(event.getUid()).getDisplayName());
+        holder.chipGroup.removeAllViews();
+        for (Chip chip : event.getChips()) {
+            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(context);
+            c.setText(chip.getName());
+            c.setClickable(false);
+            c.setCheckable(false);
+            holder.chipGroup.addView(c);
+
+        }
     }
 
     @Override
@@ -96,6 +114,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         private com.google.android.material.button.MaterialButton location;
         private CardView cardView;
         private WeakReference<EventClickListener> listenerWeakReference;
+        private ChipGroup chipGroup;
 
         ViewHolder(View view, EventClickListener listener) {
             super(view);
@@ -107,6 +126,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
             location = view.findViewById(R.id.events_location);
             cardView = view.findViewById(R.id.event_cv);
             listenerWeakReference = new WeakReference<>(listener);
+            chipGroup = view.findViewById(R.id.events_cg);
 
             interested.setOnClickListener(this);
             location.setOnClickListener(this);

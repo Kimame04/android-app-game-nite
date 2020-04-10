@@ -20,18 +20,17 @@
         android:layout_marginTop="10dp"
         android:text="@string/available_tags" />
 
-    <HorizontalScrollView
+    <ScrollView
         android:id="@+id/dialog_tag_hsv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/dialog_tag_cg"
+            android:id="@+id/dialog_tags_cg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="5dp"
-            app:singleLine="true" />
-    </HorizontalScrollView>
+            app:chipSpacingHorizontal="5dp" />
+    </ScrollView>
 
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
@@ -39,17 +38,25 @@
         android:layout_marginTop="10dp"
         android:text="@string/my_tags" />
 
-    <HorizontalScrollView
+    <ScrollView
         android:id="@+id/dialog_tag_hsv_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/dialog_tag_my_cg"
+            android:id="@+id/dialog_tags_cg_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="5dp"
-            app:singleLine="true" />
-    </HorizontalScrollView>
+            app:chipSpacingHorizontal="5dp" />
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialog_tags_btn"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:text="Save as my tags" />
 
 </LinearLayout>

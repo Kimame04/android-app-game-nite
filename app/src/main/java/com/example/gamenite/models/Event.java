@@ -16,8 +16,9 @@ public class Event {
     private String firebaseId;
     private ArrayList<String> participants = new ArrayList<>();
     private ArrayList<String> updates = new ArrayList<>();
+    private ArrayList<Chip> chips = new ArrayList<>();
 
-    public Event(String title, String description, int quota, LatLng latLng, String deadline, String uid){
+    public Event(String title, String description, int quota, LatLng latLng, String deadline, String uid, ArrayList<Chip> chips) {
         this.deadline = deadline;
         this.title = title;
         this.description = description;
@@ -26,6 +27,7 @@ public class Event {
         this.longi = latLng.longitude;
         this.lat = latLng.latitude;
         this.uid = uid;
+        this.chips = chips;
         participants.add(uid);
     }
 
@@ -124,5 +126,13 @@ public class Event {
 
     public void setUpdates(ArrayList<String> updates) {
         this.updates = updates;
+    }
+
+    public ArrayList<Chip> getChips() {
+        return chips;
+    }
+
+    public void setChips(ArrayList<Chip> chips) {
+        this.chips = chips;
     }
 }

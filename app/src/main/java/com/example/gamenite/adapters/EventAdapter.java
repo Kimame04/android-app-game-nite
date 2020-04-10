@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gamenite.R;
 import com.example.gamenite.helpers.Database;
 import com.example.gamenite.interfaces.EventClickListener;
+import com.example.gamenite.models.Chip;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
+import com.google.android.material.chip.ChipGroup;
 
 import java.lang.ref.WeakReference;
 import java.time.LocalDateTime;
@@ -50,6 +52,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         event = eventList.get(position);
         holder.title.setText(event.getTitle());
         holder.description.setText(event.getDescription());
+        for (Chip chip : event.getChips()) {
+            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(context);
+            c.setText(chip.getName());
+            c.setClickable(false);
+            c.setCheckable(false);
+            holder.chipGroup.addView(c);
+        }
         currentUser = Database.getCurrentUser();
         String displayName = Database.findUserbyUid(event.getUid()).getDisplayName();
         boolean isOrganiser = event.getUid().equals(currentUser.getUid());
@@ -83,6 +92,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         private CardView cardView;
         private com.google.android.material.button.MaterialButton makeUpdate;
         private WeakReference<EventClickListener> listenerWeakReference;
+        private ChipGroup chipGroup;
 
         ViewHolder(View view, EventClickListener listener) {
             super(view);
@@ -95,6 +105,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             location = view.findViewById(R.id.events_location);
             cardView = view.findViewById(R.id.event_cv);
             makeUpdate = view.findViewById(R.id.events_update);
+            chipGroup = view.findViewById(R.id.events_cg);
 
             makeUpdate.setOnClickListener(this);
             cancel.setOnClickListener(this);

@@ -186,6 +186,13 @@
             android:maxLines="10"
             android:paddingHorizontal="50dp"/>
 
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"
+            android:background="@color/colorPrimary" />
+
         <LinearLayout
             android:id="@+id/profile_types"
             android:layout_width="wrap_content"
@@ -202,6 +209,7 @@
                 android:textSize="20sp" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/profile_edit_tags"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
@@ -214,6 +222,22 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5dp" />
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"
+            android:background="@color/colorPrimary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/profile_add_tag"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/add_new_tag"
+            app:icon="@drawable/ic_add_black_24dp" />
 
     </LinearLayout>
 </ScrollView>

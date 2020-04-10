@@ -36,6 +36,7 @@ import com.example.gamenite.adapters.ParticipantsAdapter;
 import com.example.gamenite.helpers.CheckConnection;
 import com.example.gamenite.helpers.Database;
 import com.example.gamenite.helpers.FirebaseInfo;
+import com.example.gamenite.models.Chip;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,6 +49,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -78,6 +80,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
     private LinearLayout fragmentLl;
     private RecyclerView recyclerView;
     private ArrayList<Event> toBeAdded = new ArrayList<>();
+    private ArrayList<Chip> selectedChips = new ArrayList<>();
     private Spinner.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
@@ -139,7 +142,7 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
                         Integer.parseInt(quota.getText().toString()),
                         (LatLng) marker.getTag(),
                         localDateTime.format(dateTimeFormatter),
-                        FirebaseInfo.getFirebaseUser().getUid());
+                        FirebaseInfo.getFirebaseUser().getUid(), selectedChips);
                 String key = toEvents.getKey();
                 event.setFirebaseId(key);
                 toEvents.setValue(event);
@@ -205,6 +208,24 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
             mapView.onResume();
             mapView.getMapAsync(this);
         }
+        ChipGroup availableChips = view.findViewById(R.id.dialog_event_available_tags);
+        ChipGroup myChips = view.findViewById(R.id.dialog_event_chosen_tags);
+        for (Chip chip : Database.getChips()) {
+            com.google.android.material.chip.Chip c = new com.google.android.material.chip.Chip(getContext());
+            c.setCheckable(true);
+            c.setText(chip.getName());
+            c.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    selectedChips.add(chip);
+                    availableChips.removeView(c);
+                    myChips.addView(c);
+                } else {
+                    selectedChips.remove(chip);
+                    myChips.removeView(c);
+                    availableChips.addView(c);
+                }
+            });
+        }
         dialog.setView(view);
         dialog.show();
     }
@@ -226,7 +247,9 @@ public class EventsFragment extends Fragment implements OnMapReadyCallback {
             if (string.equals(""))
                 return false;
         }
-        return strings[2].matches("[0-9]+") && !now.isAfter(localDateTime) && hasSelectedLocation && !localDateTime.minusHours(24).isBefore(now);
+        if (!strings[2].matches("[0-9]+"))
+            return false;
+        return Integer.parseInt(strings[2]) > 2 && !now.isAfter(localDateTime) && hasSelectedLocation && !localDateTime.minusHours(24).isBefore(now);
     }
 
     private class FetchEvents extends com.example.gamenite.helpers.FetchEvents {

@@ -77,4 +77,5 @@
     <string name="achievements_hide">Hide Achievements</string>
     <string name="available_tags">Available tags</string>
     <string name="my_tags">My Tags</string>
+    <string name="add_new_tag">Add new tag</string>
 </resources>

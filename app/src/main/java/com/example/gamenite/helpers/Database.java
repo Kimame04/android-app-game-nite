@@ -3,6 +3,7 @@ package com.example.gamenite.helpers;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.gamenite.models.Chip;
 import com.example.gamenite.models.Event;
 import com.example.gamenite.models.User;
 import com.google.firebase.database.ChildEventListener;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class Database {
     private static ArrayList<User> users = new ArrayList<>();
     private static ArrayList<Event> events = new ArrayList<>();
+    private static ArrayList<Chip> chips = new ArrayList<>();
     private static User currentUser;
     private static ChildEventListener userListener = new ChildEventListener() {
         @Override
@@ -83,15 +85,40 @@ public class Database {
         public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
 
         @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+        }
+    };
+    private static ChildEventListener chipListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            chips.add(dataSnapshot.getValue(Chip.class));
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        }
+
+        @Override
         public void onCancelled(@NonNull DatabaseError databaseError) { }
     };
     public static void initDatabase(){
         users.clear();
         events.clear();
+        chips.clear();
         DatabaseReference userReference = FirebaseInfo.getFirebaseDatabase().getReference().child("Users");
         DatabaseReference eventReference = FirebaseInfo.getFirebaseDatabase().getReference().child("Events");
+        DatabaseReference chipReference = FirebaseInfo.getFirebaseDatabase().getReference().child("Chips");
         userReference.addChildEventListener(userListener);
         eventReference.addChildEventListener(eventListener);
+        chipReference.addChildEventListener(chipListener);
     }
     public static User getCurrentUser(){
         return currentUser;
@@ -127,5 +154,9 @@ public class Database {
     }
     public static ArrayList<User> getUsers(){return users;}
     public static ArrayList<Event> getEvents(){return events;}
+
+    public static ArrayList<Chip> getChips() {
+        return chips;
+    }
 
 }
